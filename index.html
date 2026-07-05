@@ -40,9 +40,15 @@
     </div>
 
     <div class="form-group">
+      <label>CSVファイルから読み込む（左から「番号,英語,日本語」の順）</label>
+      <input type="file" id="wordbook-csv" accept=".csv,text/csv">
+      <p class="field-hint">Excel等で作成したCSVファイルを選択すると、下の入力欄に自動で反映されます（UTF-8 / Shift-JIS 両対応）。</p>
+    </div>
+
+    <div class="form-group">
       <label>単語データ（1行に1単語。「番号,単語,意味」の形式）</label>
       <textarea id="wordbook-entries" rows="10" placeholder="1,apple,りんご&#10;2,book,本&#10;3,cat,猫"></textarea>
-      <p class="field-hint">カンマ区切り、またはタブ区切りで入力できます。</p>
+      <p class="field-hint">CSV読み込み後もこちらで内容を確認・編集できます。カンマ区切り、またはタブ区切りに対応しています。</p>
     </div>
 
     <button id="btn-save-wordbook" class="btn-primary">保存する</button>

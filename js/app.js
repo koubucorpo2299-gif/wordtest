@@ -120,6 +120,105 @@ function entriesToText(entries) {
   return entries.map((e) => `${e.number},${e.word},${e.meaning}`).join("\n");
 }
 
+/* --- CSV import --- */
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += c;
+      }
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field);
+      field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = "";
+    } else {
+      field += c;
+    }
+  }
+  if (field.length > 0 || row.length > 0) {
+    row.push(field);
+    rows.push(row);
+  }
+  return rows.filter((r) => r.some((cell) => cell.trim().length > 0));
+}
+
+function csvRowsToEntries(rows) {
+  return rows
+    .map((row) => {
+      const [numberStr, word, meaning] = row.map((c) => (c || "").trim());
+      return {
+        number: parseInt(numberStr, 10),
+        word: word || "",
+        meaning: meaning || "",
+      };
+    })
+    .filter((e) => !Number.isNaN(e.number) && e.word);
+}
+
+function decodeFileAsText(file) {
+  return file.arrayBuffer().then((buffer) => {
+    const utf8Text = new TextDecoder("utf-8").decode(buffer);
+    const hasReplacementChars = (utf8Text.match(/�/g) || []).length > 2;
+    if (!hasReplacementChars) return utf8Text;
+    try {
+      return new TextDecoder("shift-jis").decode(buffer);
+    } catch {
+      return utf8Text;
+    }
+  });
+}
+
+document.getElementById("wordbook-csv").addEventListener("change", async (ev) => {
+  const file = ev.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await decodeFileAsText(file);
+    const rows = parseCSV(text);
+    const entries = csvRowsToEntries(rows);
+
+    if (entries.length === 0) {
+      alert("CSVから単語データを読み取れませんでした。「番号,英語,日本語」の順になっているか確認してください。");
+      return;
+    }
+
+    const textarea = document.getElementById("wordbook-entries");
+    if (textarea.value.trim() && !confirm("入力欄の内容をCSVの内容で置き換えますか？")) {
+      return;
+    }
+    textarea.value = entriesToText(entries);
+
+    if (!document.getElementById("wordbook-name").value.trim()) {
+      document.getElementById("wordbook-name").value = file.name.replace(/\.csv$/i, "");
+    }
+  } catch (err) {
+    alert("CSVファイルの読み込みに失敗しました。");
+  } finally {
+    ev.target.value = "";
+  }
+});
+
 /* --- Word book modal --- */
 
 const wordbookModal = document.getElementById("wordbook-modal");
@@ -132,6 +231,7 @@ function openWordBookModal(bookId) {
   document.getElementById("wordbook-modal-title").textContent = book ? "単語帳を編集" : "単語帳を追加";
   document.getElementById("wordbook-name").value = book ? book.name : "";
   document.getElementById("wordbook-entries").value = book ? entriesToText(book.entries) : "";
+  document.getElementById("wordbook-csv").value = "";
 
   wordbookModal.classList.remove("hidden");
 }
