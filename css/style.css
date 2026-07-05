@@ -1,0 +1,319 @@
+:root {
+  --navy: #2b3a67;
+  --navy-dark: #1e2a4f;
+  --indigo-text: #33418f;
+  --field-bg: #f3f4f6;
+  --border: #e2e4ea;
+  --page-bg: #eef0f4;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  background: var(--page-bg);
+  color: #23262f;
+}
+
+.app-header {
+  background: #fff;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--indigo-text);
+}
+
+.app-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.wordbook-panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--indigo-text);
+}
+
+.wordbook-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wordbook-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.wordbook-item-info .name {
+  font-weight: bold;
+  color: #23262f;
+}
+
+.wordbook-item-info .meta {
+  font-size: 13px;
+  color: #8b8f9a;
+  margin-top: 4px;
+}
+
+.wordbook-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-hint {
+  color: #8b8f9a;
+  padding: 24px;
+  text-align: center;
+}
+
+/* Buttons */
+.btn-primary, .btn-secondary, .btn-danger {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: #fff;
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  margin-top: 8px;
+}
+.btn-primary:hover { background: var(--navy-dark); }
+
+.btn-secondary {
+  background: var(--field-bg);
+  color: var(--indigo-text);
+}
+.btn-secondary:hover { background: #e6e8ee; }
+
+.btn-danger {
+  background: #fdecea;
+  color: #c0392b;
+}
+.btn-danger:hover { background: #fbdad7; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 34, 45, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  width: 480px;
+  max-width: 92vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--indigo-text);
+  font-size: 22px;
+}
+
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #8b8f9a;
+  line-height: 1;
+}
+
+.modal-sub {
+  color: #8b8f9a;
+  margin: 6px 0 20px;
+  font-size: 14px;
+}
+
+.form-row.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: #55596b;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--field-bg);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #8b8f9a;
+  margin: 6px 0 0;
+}
+
+/* Test preview */
+.test-preview {
+  margin-top: 28px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.test-preview.hidden { display: none; }
+
+.test-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.test-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid #23262f;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.test-sheet-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.test-sheet-header .meta {
+  font-size: 13px;
+  color: #55596b;
+}
+
+.test-sheet-header .name-field {
+  font-size: 14px;
+}
+
+.test-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 32px;
+}
+
+.test-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.test-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.test-row .num {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 6px;
+  min-width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.test-row .word {
+  flex: 1 1 40%;
+  border: 1px solid var(--navy);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.test-row .blank {
+  flex: 1 1 50%;
+  border: 1px solid #c7cad4;
+  border-radius: 6px;
+  min-height: 34px;
+}
+
+@media print {
+  .app-header, .wordbook-panel, .test-toolbar, .modal-overlay {
+    display: none !important;
+  }
+  .app-main { padding: 0; max-width: none; }
+  .test-preview {
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+  body { background: #fff; }
+}
