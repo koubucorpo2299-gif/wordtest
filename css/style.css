@@ -232,6 +232,20 @@ body {
   margin-bottom: 20px;
 }
 
+.sheet-page + .sheet-page {
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 2px dashed #c7cad4;
+}
+
+.answer-sheet .test-row .blank {
+  color: #c0392b;
+  font-weight: bold;
+  padding: 8px 10px;
+  align-items: center;
+  display: flex;
+}
+
 .test-sheet-header {
   display: flex;
   justify-content: space-between;
@@ -316,4 +330,11 @@ body {
     margin: 0;
   }
   body { background: #fff; }
+
+  .sheet-page + .sheet-page {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    page-break-before: always;
+  }
 }

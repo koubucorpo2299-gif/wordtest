@@ -334,9 +334,7 @@ function shuffle(arr) {
   return arr;
 }
 
-function renderTestSheet(book, entries, direction) {
-  const preview = document.getElementById("test-preview");
-
+function buildSheetHtml(book, entries, direction, title, showAnswer) {
   const half = Math.ceil(entries.length / 2);
   const leftCol = entries.slice(0, half);
   const rightCol = entries.slice(half);
@@ -345,23 +343,20 @@ function renderTestSheet(book, entries, direction) {
 
   const rowHtml = (e) => {
     const shown = direction === "word-meaning" ? e.word : e.meaning;
+    const answer = direction === "word-meaning" ? e.meaning : e.word;
     return `
       <div class="test-row">
         <span class="num">${e.number}</span>
         <span class="word">${escapeHtml(shown)}</span>
-        <span class="blank"></span>
+        <span class="blank">${showAnswer ? escapeHtml(answer) : ""}</span>
       </div>
     `;
   };
 
-  preview.innerHTML = `
-    <div class="test-toolbar">
-      <button id="btn-back" class="btn-secondary">一覧に戻る</button>
-      <button id="btn-print" class="btn-primary" style="width:auto;margin:0;">印刷する</button>
-    </div>
+  return `
     <div class="test-sheet-header">
       <div>
-        <h2>${escapeHtml(book.name)} 小テスト</h2>
+        <h2>${escapeHtml(book.name)} ${title}</h2>
         <div class="meta">出題方向：${directionLabel}／問題数：${entries.length}問</div>
       </div>
       <div class="name-field">氏名：＿＿＿＿＿＿＿＿＿＿＿＿＿</div>
@@ -369,6 +364,23 @@ function renderTestSheet(book, entries, direction) {
     <div class="test-grid">
       <div class="test-column">${leftCol.map(rowHtml).join("")}</div>
       <div class="test-column">${rightCol.map(rowHtml).join("")}</div>
+    </div>
+  `;
+}
+
+function renderTestSheet(book, entries, direction) {
+  const preview = document.getElementById("test-preview");
+
+  preview.innerHTML = `
+    <div class="test-toolbar">
+      <button id="btn-back" class="btn-secondary">一覧に戻る</button>
+      <button id="btn-print" class="btn-primary" style="width:auto;margin:0;">印刷する（問題＋解答）</button>
+    </div>
+    <div class="sheet-page">
+      ${buildSheetHtml(book, entries, direction, "小テスト", false)}
+    </div>
+    <div class="sheet-page answer-sheet">
+      ${buildSheetHtml(book, entries, direction, "解答", true)}
     </div>
   `;
 
