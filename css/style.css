@@ -258,6 +258,15 @@ body {
 .test-sheet-header h2 {
   margin: 0;
   font-size: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.test-sheet-header h2 .range {
+  font-size: 14px;
+  font-weight: normal;
+  color: #55596b;
 }
 
 .test-sheet-header .meta {

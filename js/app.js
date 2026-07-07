@@ -322,7 +322,7 @@ document.getElementById("btn-generate").addEventListener("click", () => {
     selected.sort((a, b) => a.number - b.number);
   }
 
-  renderTestSheet(book, selected, direction);
+  renderTestSheet(book, selected, direction, start, end);
   closeModal("test-modal");
 });
 
@@ -334,7 +334,7 @@ function shuffle(arr) {
   return arr;
 }
 
-function buildSheetHtml(book, entries, direction, title, showAnswer) {
+function buildSheetHtml(book, entries, direction, title, showAnswer, rangeStart, rangeEnd) {
   const half = Math.ceil(entries.length / 2);
   const leftCol = entries.slice(0, half);
   const rightCol = entries.slice(half);
@@ -356,7 +356,7 @@ function buildSheetHtml(book, entries, direction, title, showAnswer) {
   return `
     <div class="test-sheet-header">
       <div>
-        <h2>${escapeHtml(book.name)} ${title}</h2>
+        <h2>${escapeHtml(book.name)} ${title}<span class="range">範囲：${rangeStart}〜${rangeEnd}</span></h2>
         <div class="meta">出題方向：${directionLabel}／問題数：${entries.length}問</div>
       </div>
       <div class="name-field">氏名：＿＿＿＿＿＿＿＿＿＿＿＿＿</div>
@@ -368,7 +368,7 @@ function buildSheetHtml(book, entries, direction, title, showAnswer) {
   `;
 }
 
-function renderTestSheet(book, entries, direction) {
+function renderTestSheet(book, entries, direction, rangeStart, rangeEnd) {
   const preview = document.getElementById("test-preview");
 
   preview.innerHTML = `
@@ -377,10 +377,10 @@ function renderTestSheet(book, entries, direction) {
       <button id="btn-print" class="btn-primary" style="width:auto;margin:0;">印刷する（問題＋解答）</button>
     </div>
     <div class="sheet-page">
-      ${buildSheetHtml(book, entries, direction, "小テスト", false)}
+      ${buildSheetHtml(book, entries, direction, "小テスト", false, rangeStart, rangeEnd)}
     </div>
     <div class="sheet-page answer-sheet">
-      ${buildSheetHtml(book, entries, direction, "解答", true)}
+      ${buildSheetHtml(book, entries, direction, "解答", true, rangeStart, rangeEnd)}
     </div>
   `;
 
