@@ -276,6 +276,21 @@ document.getElementById("btn-save-wordbook").addEventListener("click", () => {
 /* --- Test creation modal --- */
 
 const testModal = document.getElementById("test-modal");
+const TEST_SETTINGS_KEY = "vocabApp.lastTestSettings";
+
+function loadLastTestSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(TEST_SETTINGS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLastTestSettings(bookId, settings) {
+  const all = loadLastTestSettings();
+  all[bookId] = settings;
+  localStorage.setItem(TEST_SETTINGS_KEY, JSON.stringify(all));
+}
 
 function openTestModal(bookId) {
   activeWordBookId = bookId;
@@ -283,11 +298,13 @@ function openTestModal(bookId) {
   if (!book) return;
 
   const numbers = book.entries.map((e) => e.number);
-  document.getElementById("range-start").value = Math.min(...numbers);
-  document.getElementById("range-end").value = Math.max(...numbers);
-  document.getElementById("question-count").value = Math.min(20, book.entries.length);
-  document.getElementById("direction").value = "word-meaning";
-  document.getElementById("order").value = "shuffle";
+  const last = loadLastTestSettings()[bookId];
+
+  document.getElementById("range-start").value = last ? last.start : Math.min(...numbers);
+  document.getElementById("range-end").value = last ? last.end : Math.max(...numbers);
+  document.getElementById("question-count").value = last ? last.count : Math.min(20, book.entries.length);
+  document.getElementById("direction").value = last ? last.direction : "word-meaning";
+  document.getElementById("order").value = last ? last.order : "shuffle";
 
   testModal.classList.remove("hidden");
 }
@@ -322,6 +339,7 @@ document.getElementById("btn-generate").addEventListener("click", () => {
     selected.sort((a, b) => a.number - b.number);
   }
 
+  saveLastTestSettings(activeWordBookId, { start, end, count, direction, order });
   renderTestSheet(book, selected, direction, start, end);
   closeModal("test-modal");
 });
