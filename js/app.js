@@ -1,61 +1,78 @@
-const STORAGE_KEY = "vocabApp.wordBooks";
-
-const sampleWordBooks = [
-  {
-    id: "sample-english",
-    name: "サンプル英単語帳（デモ用）",
-    entries: [
-      { number: 1, word: "apple", meaning: "りんご" },
-      { number: 2, word: "book", meaning: "本" },
-      { number: 3, word: "cat", meaning: "猫" },
-      { number: 4, word: "dog", meaning: "犬" },
-      { number: 5, word: "egg", meaning: "卵" },
-      { number: 6, word: "fish", meaning: "魚" },
-      { number: 7, word: "green", meaning: "緑" },
-      { number: 8, word: "house", meaning: "家" },
-      { number: 9, word: "ink", meaning: "インク" },
-      { number: 10, word: "jump", meaning: "跳ぶ" },
-      { number: 11, word: "kind", meaning: "親切な" },
-      { number: 12, word: "lion", meaning: "ライオン" },
-      { number: 13, word: "moon", meaning: "月" },
-      { number: 14, word: "night", meaning: "夜" },
-      { number: 15, word: "open", meaning: "開ける" },
-    ],
-  },
-  {
-    id: "sample-kobun",
-    name: "サンプル古語単語帳（デモ用）",
-    entries: [
-      { number: 1, word: "あいなし", meaning: "つまらない・気にくわない" },
-      { number: 2, word: "いと", meaning: "とても" },
-      { number: 3, word: "うつつ", meaning: "現実" },
-      { number: 4, word: "おとなし", meaning: "大人びている" },
-      { number: 5, word: "かなし", meaning: "いとしい" },
-      { number: 6, word: "きこゆ", meaning: "申し上げる" },
-      { number: 7, word: "こころざし", meaning: "気持ち・愛情" },
-      { number: 8, word: "しるし", meaning: "効果・証拠" },
-      { number: 9, word: "つとめて", meaning: "早朝" },
-      { number: 10, word: "ののしる", meaning: "大声で騒ぐ" },
-    ],
-  },
-];
+// 共有単語帳（js/data.js）はアプリに組み込まれているため、
+// URLを開いた全PCで自動的に同じ内容が表示されます。
+// ブラウザ内で行った追加・編集は、この端末だけに保存されます（上書き／追加分として記録）。
+const OLD_STORAGE_KEY = "vocabApp.wordBooks";
+const OVERRIDES_KEY = "vocabApp.localOverrides";
+const DELETED_IDS_KEY = "vocabApp.deletedSharedIds";
 
 let wordBooks = loadWordBooks();
 let activeWordBookId = null;
 
-function loadWordBooks() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return JSON.parse(JSON.stringify(sampleWordBooks));
+function loadJSON(key, fallback) {
   try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length ? parsed : JSON.parse(JSON.stringify(sampleWordBooks));
+    const parsed = JSON.parse(localStorage.getItem(key));
+    return parsed === null || parsed === undefined ? fallback : parsed;
   } catch {
-    return JSON.parse(JSON.stringify(sampleWordBooks));
+    return fallback;
   }
 }
 
+function migrateOldStorageIfNeeded() {
+  if (localStorage.getItem(OVERRIDES_KEY) !== null) return;
+  const oldRaw = localStorage.getItem(OLD_STORAGE_KEY);
+  if (!oldRaw) return;
+
+  try {
+    const oldBooks = JSON.parse(oldRaw);
+    if (!Array.isArray(oldBooks)) return;
+
+    const overrides = {};
+    oldBooks.forEach((b) => {
+      overrides[b.id] = b;
+    });
+    const deletedIds = sharedWordBooks
+      .filter((s) => !oldBooks.some((b) => b.id === s.id))
+      .map((s) => s.id);
+
+    localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
+    localStorage.setItem(DELETED_IDS_KEY, JSON.stringify(deletedIds));
+  } catch {
+    // ignore malformed legacy data
+  }
+}
+
+function loadWordBooks() {
+  migrateOldStorageIfNeeded();
+
+  const overrides = loadJSON(OVERRIDES_KEY, {});
+  const deletedIds = loadJSON(DELETED_IDS_KEY, []);
+
+  const shared = sharedWordBooks
+    .filter((b) => !deletedIds.includes(b.id))
+    .map((b) => overrides[b.id] || b);
+
+  const localOnly = Object.keys(overrides)
+    .filter((id) => !sharedWordBooks.some((b) => b.id === id))
+    .map((id) => overrides[id]);
+
+  return [...shared, ...localOnly];
+}
+
 function saveWordBooks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(wordBooks));
+  const overrides = {};
+  wordBooks.forEach((b) => {
+    const sharedMatch = sharedWordBooks.find((s) => s.id === b.id);
+    if (!sharedMatch || JSON.stringify(sharedMatch) !== JSON.stringify(b)) {
+      overrides[b.id] = b;
+    }
+  });
+
+  const deletedIds = sharedWordBooks
+    .filter((s) => !wordBooks.some((b) => b.id === s.id))
+    .map((s) => s.id);
+
+  localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
+  localStorage.setItem(DELETED_IDS_KEY, JSON.stringify(deletedIds));
 }
 
 function getWordBook(id) {
