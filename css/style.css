@@ -342,7 +342,7 @@ body {
 }
 
 @media print {
-  .app-header, .wordbook-panel, .test-toolbar, .modal-overlay {
+  .app-header, .wordbook-panel, .test-builder-panel, .test-toolbar, .modal-overlay {
     display: none !important;
   }
   .app-main { padding: 0; max-width: none; }
