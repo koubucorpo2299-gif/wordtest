@@ -13,6 +13,54 @@
   </header>
 
   <main class="app-main">
+    <section class="test-builder-panel">
+      <h2>小テストを作成</h2>
+      <div class="form-group">
+        <label>対象の単語帳</label>
+        <select id="wordbook-select">
+          <option value="">-- 単語帳を選択してください --</option>
+        </select>
+      </div>
+
+      <div id="test-builder-fields" class="hidden">
+        <div class="form-row two-col">
+          <div class="form-group">
+            <label>開始番号</label>
+            <input type="number" id="range-start" min="1">
+          </div>
+          <div class="form-group">
+            <label>終了番号</label>
+            <input type="number" id="range-end" min="1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>問題数</label>
+          <input type="number" id="question-count" min="1">
+        </div>
+
+        <div class="form-group">
+          <label>出題方向</label>
+          <select id="direction">
+            <option value="word-meaning">英語→日本語</option>
+            <option value="meaning-word">日本語→英語</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>並び順</label>
+          <select id="order">
+            <option value="shuffle">シャッフル</option>
+            <option value="sequential">番号順</option>
+          </select>
+        </div>
+
+        <button id="btn-generate" class="btn-primary">作成する</button>
+      </div>
+    </section>
+
+    <section id="test-preview" class="test-preview hidden"></section>
+
     <section class="wordbook-panel">
       <div class="panel-header">
         <h2>単語帳一覧</h2>
@@ -20,8 +68,6 @@
       </div>
       <ul id="wordbook-list" class="wordbook-list"></ul>
     </section>
-
-    <section id="test-preview" class="test-preview hidden"></section>
   </main>
 </div>
 
@@ -52,51 +98,6 @@
     </div>
 
     <button id="btn-save-wordbook" class="btn-primary">保存する</button>
-  </div>
-</div>
-
-<!-- 小テスト作成 モーダル -->
-<div id="test-modal" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>小テスト作成</h2>
-      <button class="modal-close" data-close="test-modal">&times;</button>
-    </div>
-    <p class="modal-sub">問題範囲と問題数を指定してください</p>
-
-    <div class="form-row two-col">
-      <div class="form-group">
-        <label>開始番号</label>
-        <input type="number" id="range-start" min="1">
-      </div>
-      <div class="form-group">
-        <label>終了番号</label>
-        <input type="number" id="range-end" min="1">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>問題数</label>
-      <input type="number" id="question-count" min="1">
-    </div>
-
-    <div class="form-group">
-      <label>出題方向</label>
-      <select id="direction">
-        <option value="word-meaning">英語→日本語</option>
-        <option value="meaning-word">日本語→英語</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>並び順</label>
-      <select id="order">
-        <option value="shuffle">シャッフル</option>
-        <option value="sequential">番号順</option>
-      </select>
-    </div>
-
-    <button id="btn-generate" class="btn-primary">作成する</button>
   </div>
 </div>
 

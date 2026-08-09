@@ -84,13 +84,33 @@ function renderWordBookList() {
         <div class="meta">単語数: ${book.entries.length} ／ 番号範囲: ${min}〜${max}</div>
       </div>
       <div class="wordbook-item-actions">
-        <button class="btn-primary btn-make-test" style="width:auto;margin:0;" data-id="${book.id}">小テスト作成</button>
         <button class="btn-secondary btn-edit" data-id="${book.id}">編集</button>
         <button class="btn-danger btn-delete" data-id="${book.id}">削除</button>
       </div>
     `;
     list.appendChild(li);
   });
+}
+
+function renderWordBookSelect() {
+  const select = document.getElementById("wordbook-select");
+  const previousValue = select.value;
+
+  select.innerHTML = '<option value="">-- 単語帳を選択してください --</option>';
+  wordBooks.forEach((book) => {
+    const option = document.createElement("option");
+    option.value = book.id;
+    option.textContent = book.name;
+    select.appendChild(option);
+  });
+
+  if (wordBooks.some((b) => b.id === previousValue)) {
+    select.value = previousValue;
+  } else {
+    select.value = "";
+    document.getElementById("test-builder-fields").classList.add("hidden");
+    activeWordBookId = null;
+  }
 }
 
 function escapeHtml(str) {
@@ -270,12 +290,12 @@ document.getElementById("btn-save-wordbook").addEventListener("click", () => {
 
   saveWordBooks();
   renderWordBookList();
+  renderWordBookSelect();
   closeModal("wordbook-modal");
 });
 
-/* --- Test creation modal --- */
+/* --- Test creation (inline, driven by top word book selector) --- */
 
-const testModal = document.getElementById("test-modal");
 const TEST_SETTINGS_KEY = "vocabApp.lastTestSettings";
 
 function loadLastTestSettings() {
@@ -292,10 +312,15 @@ function saveLastTestSettings(bookId, settings) {
   localStorage.setItem(TEST_SETTINGS_KEY, JSON.stringify(all));
 }
 
-function openTestModal(bookId) {
-  activeWordBookId = bookId;
-  const book = getWordBook(bookId);
-  if (!book) return;
+function onWordBookSelected(bookId) {
+  activeWordBookId = bookId || null;
+  const fields = document.getElementById("test-builder-fields");
+
+  const book = bookId ? getWordBook(bookId) : null;
+  if (!book) {
+    fields.classList.add("hidden");
+    return;
+  }
 
   const numbers = book.entries.map((e) => e.number);
   const last = loadLastTestSettings()[bookId];
@@ -306,8 +331,12 @@ function openTestModal(bookId) {
   document.getElementById("direction").value = last ? last.direction : "word-meaning";
   document.getElementById("order").value = last ? last.order : "shuffle";
 
-  testModal.classList.remove("hidden");
+  fields.classList.remove("hidden");
 }
+
+document.getElementById("wordbook-select").addEventListener("change", (ev) => {
+  onWordBookSelected(ev.target.value);
+});
 
 document.getElementById("btn-generate").addEventListener("click", () => {
   const book = getWordBook(activeWordBookId);
@@ -341,7 +370,6 @@ document.getElementById("btn-generate").addEventListener("click", () => {
 
   saveLastTestSettings(activeWordBookId, { start, end, count, direction, order });
   renderTestSheet(book, selected, direction, start, end);
-  closeModal("test-modal");
 });
 
 function shuffle(arr) {
@@ -419,15 +447,14 @@ document.getElementById("wordbook-list").addEventListener("click", (ev) => {
   const id = target.getAttribute("data-id");
   if (!id) return;
 
-  if (target.classList.contains("btn-make-test")) {
-    openTestModal(id);
-  } else if (target.classList.contains("btn-edit")) {
+  if (target.classList.contains("btn-edit")) {
     openWordBookModal(id);
   } else if (target.classList.contains("btn-delete")) {
     if (confirm("この単語帳を削除しますか？")) {
       wordBooks = wordBooks.filter((b) => b.id !== id);
       saveWordBooks();
       renderWordBookList();
+      renderWordBookSelect();
     }
   }
 });
@@ -443,3 +470,4 @@ document.querySelectorAll(".modal-overlay").forEach((overlay) => {
 });
 
 renderWordBookList();
+renderWordBookSelect();

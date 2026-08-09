@@ -34,12 +34,25 @@ body {
   padding: 32px 20px;
 }
 
-.wordbook-panel {
+.wordbook-panel,
+.test-builder-panel {
   background: #fff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
+
+.test-builder-panel {
+  margin-bottom: 24px;
+}
+
+.test-builder-panel h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  color: var(--indigo-text);
+}
+
+.hidden { display: none; }
 
 .panel-header {
   display: flex;
