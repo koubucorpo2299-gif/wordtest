@@ -49,7 +49,7 @@ function loadWordBooks() {
 
   const shared = sharedWordBooks
     .filter((b) => !deletedIds.includes(b.id))
-    .map((b) => overrides[b.id] || b);
+    .map((b) => overrides[b.id] || JSON.parse(JSON.stringify(b)));
 
   const localOnly = Object.keys(overrides)
     .filter((id) => !sharedWordBooks.some((b) => b.id === id))
